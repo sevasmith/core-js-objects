@@ -128,8 +128,9 @@ function isEmptyObject(obj) {
  *    immutableObj.newProp = 'new';
  *    console.log(immutableObj) => {a: 1, b: 2}
  */
-function makeImmutable(/* obj */) {
-  throw new Error('Not implemented');
+function makeImmutable(obj) {
+  const immutableObj = Object.freeze(obj);
+  return immutableObj;
 }
 
 /**
@@ -142,8 +143,16 @@ function makeImmutable(/* obj */) {
  *    makeWord({ a: [0, 1], b: [2, 3], c: [4, 5] }) => 'aabbcc'
  *    makeWord({ H:[0], e: [1], l: [2, 3, 8], o: [4, 6], W:[5], r:[7], d:[9]}) => 'HelloWorld'
  */
-function makeWord(/* lettersObject */) {
-  throw new Error('Not implemented');
+function makeWord(lettersObject) {
+  const letterArray = [];
+  const entries = Object.entries(lettersObject);
+  entries.forEach(([key, values]) => {
+    values.forEach((value) => {
+      letterArray[value] = key;
+    });
+  });
+  const word = letterArray.join('');
+  return word;
 }
 
 /**
@@ -160,8 +169,31 @@ function makeWord(/* lettersObject */) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+function sellTickets(queue) {
+  const pocket = { 100: 0, 50: 0, 25: 0 };
+  const ticketPrice = 25;
+
+  function canGiveChange(customerMoney) {
+    let change = customerMoney - ticketPrice;
+    pocket[customerMoney] += 1;
+
+    if (change === 0) return true;
+
+    const banknotes = Object.keys(pocket).map(Number);
+    banknotes.sort((a, b) => b - a);
+
+    banknotes.some((banknote) => {
+      while (pocket[banknote] > 0 && banknote <= change) {
+        pocket[banknote] -= 1;
+        change -= banknote;
+      }
+      return change === 0;
+    });
+
+    return change === 0;
+  }
+
+  return queue.every(canGiveChange);
 }
 
 /**
